@@ -9,6 +9,17 @@
         "start:website": "cd ./web && npm run start:website",
         "remove-static-from-web": "cd ./web/server && python manage.py runscript static_remover"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/CreamMeatball/TrAiAngle.git"
+    },
     "author": "",
-    "license": "ISC"
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/CreamMeatball/TrAiAngle/pulls"
+    },
+    "homepage": "https://github.com/CreamMeatball/TrAiAngle",
+    "dependencies": {
+        "vite": "^5.4.6"
+    }
 }
