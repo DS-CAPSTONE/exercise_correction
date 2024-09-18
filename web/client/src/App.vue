@@ -1,11 +1,13 @@
-<script setup></script>
+<script setup>
+</script>
 
 <template>
     <div class="site-container">
         <!-- Navbar -->
         <nav>
             <RouterLink :to="{ name: 'Home' }" class="nav__header">
-                Exercise Correction
+              <i class="fa-solid fa-caret-right"></i>
+                TRAiANGLE
             </RouterLink>
         </nav>
 
@@ -16,23 +18,23 @@
         </main>
 
         <!-- Footer -->
-        <footer>
-            <a
-                href="https://twitter.com/ngohquocbao1010"
-                target="_blank"
-                class="twitter"
-            >
-                @NgoQuocBao
-            </a>
+<!--        <footer>-->
+<!--            <a-->
+<!--                href="https://twitter.com/ngohquocbao1010"-->
+<!--                target="_blank"-->
+<!--                class="twitter"-->
+<!--            >-->
+<!--                @NgoQuocBao-->
+<!--            </a>-->
 
-            <a
-                href="https://github.com/NgoQuocBao1010/Exercise-Correction"
-                target="_blank"
-                class="github"
-            >
-                <i class="fa-brands fa-github"></i>
-            </a>
-        </footer>
+<!--            <a-->
+<!--                href="https://github.com/NgoQuocBao1010/Exercise-Correction"-->
+<!--                target="_blank"-->
+<!--                class="github"-->
+<!--            >-->
+<!--                <i class="fa-brands fa-github"></i>-->
+<!--            </a>-->
+<!--        </footer>-->
     </div>
 </template>
 
@@ -52,9 +54,44 @@ body {
             font-size: 2rem;
             font-family: var(--font-family);
             font-weight: 700;
-            text-transform: uppercase;
+            //text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--primary-color);
+
+              background-image: linear-gradient(
+                to right,
+                #8958BAFF,
+                #8958ba 50%,
+                #9E6DD3FF 50%
+              );
+              background-size: 200% 100%;
+              background-position: -100%;
+              display: inline-block;
+              padding: 5px 0;
+              position: relative;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              transition: all 0.3s ease-in-out;
+
+            &:before {
+              content: '';
+              background: #8958BAFF;
+              display: block;
+              position: absolute;
+              bottom: -3px;
+              left: 0;
+              width: 0;
+              height: 3px;
+              transition: all 0.3s ease-in-out;
+            }
+
+            &:hover {
+             background-position: 0;
+            }
+
+            &:hover::before {
+              width:100%;
+            }
         }
     }
 

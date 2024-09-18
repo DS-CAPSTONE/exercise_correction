@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser
 from django.http import StreamingHttpResponse
 from django.http import JsonResponse
+from django.core.files.base import ContentFile
 
 from detection.main import exercise_detection
 from detection.utils import get_static_file_url
@@ -74,9 +75,16 @@ def upload_video(request):
             now = int(now.strftime("%Y%m%d%H%M%S"))
             name_to_save = f"video_{now}.mp4"
 
-            # Process and Saved Video
+            # Save the uploaded file to a temporary location
+            video_content = ContentFile(video.read())
+            video_path = f"/tmp/{name_to_save}"
+
+            with open(video_path, 'wb') as temp_video_file:
+                temp_video_file.write(video_content.read())
+
+            # Process and save the video
             results, *other_data = exercise_detection(
-                video_file_path=video.temporary_file_path(),
+                video_file_path=video_path,
                 video_name_to_save=name_to_save,
                 exercise_type=exercise_type,
                 rescale_percent=40,

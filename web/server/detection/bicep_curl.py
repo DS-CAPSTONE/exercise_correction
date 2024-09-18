@@ -71,14 +71,17 @@ class BicepPoseAnalysis:
         self.shoulder = [
             landmarks[mp_pose.PoseLandmark[f"{side}_SHOULDER"].value].x,
             landmarks[mp_pose.PoseLandmark[f"{side}_SHOULDER"].value].y,
+            landmarks[mp_pose.PoseLandmark[f"{side}_SHOULDER"].value].z,
         ]
         self.elbow = [
             landmarks[mp_pose.PoseLandmark[f"{side}_ELBOW"].value].x,
             landmarks[mp_pose.PoseLandmark[f"{side}_ELBOW"].value].y,
+            landmarks[mp_pose.PoseLandmark[f"{side}_ELBOW"].value].z,
         ]
         self.wrist = [
             landmarks[mp_pose.PoseLandmark[f"{side}_WRIST"].value].x,
             landmarks[mp_pose.PoseLandmark[f"{side}_WRIST"].value].y,
+            landmarks[mp_pose.PoseLandmark[f"{side}_WRIST"].value].z,
         ]
 
         return self.is_visible
@@ -122,6 +125,7 @@ class BicepPoseAnalysis:
         shoulder_projection = [
             self.shoulder[0],
             1,
+            self.shoulder[2],
         ]  # Represent the projection of the shoulder to the X axis
         ground_upper_arm_angle = int(
             calculate_angle(self.elbow, self.shoulder, shoulder_projection)
@@ -248,7 +252,7 @@ class BicepCurlDetection:
 
     # LOOSE UPPER ARM error detection
     LOOSE_UPPER_ARM = False
-    LOOSE_UPPER_ARM_ANGLE_THRESHOLD = 40
+    LOOSE_UPPER_ARM_ANGLE_THRESHOLD = 55
 
     # STANDING POSTURE error detection
     POSTURE_ERROR_THRESHOLD = 0.95
@@ -538,7 +542,7 @@ class BicepCurlDetection:
                     str(left_bicep_curl_angle),
                     tuple(
                         np.multiply(
-                            self.left_arm_analysis.elbow, video_dimensions
+                            self.left_arm_analysis.elbow[:2], video_dimensions
                         ).astype(int)
                     ),
                     cv2.FONT_HERSHEY_COMPLEX,
@@ -552,7 +556,7 @@ class BicepCurlDetection:
                     str(left_ground_upper_arm_angle),
                     tuple(
                         np.multiply(
-                            self.left_arm_analysis.shoulder, video_dimensions
+                            self.left_arm_analysis.shoulder[:2], video_dimensions
                         ).astype(int)
                     ),
                     cv2.FONT_HERSHEY_COMPLEX,
@@ -569,7 +573,7 @@ class BicepCurlDetection:
                     str(right_bicep_curl_angle),
                     tuple(
                         np.multiply(
-                            self.right_arm_analysis.elbow, video_dimensions
+                            self.right_arm_analysis.elbow[:2], video_dimensions
                         ).astype(int)
                     ),
                     cv2.FONT_HERSHEY_COMPLEX,
@@ -583,7 +587,7 @@ class BicepCurlDetection:
                     str(right_ground_upper_arm_angle),
                     tuple(
                         np.multiply(
-                            self.right_arm_analysis.shoulder, video_dimensions
+                            self.right_arm_analysis.shoulder[:2], video_dimensions
                         ).astype(int)
                     ),
                     cv2.FONT_HERSHEY_COMPLEX,

@@ -64,10 +64,12 @@ def analyze_foot_knee_placement(
     left_shoulder = [
         landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
         landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y,
+        landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].z,
     ]
     right_shoulder = [
         landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
         landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y,
+        landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].z,
     ]
     shoulder_width = calculate_distance(left_shoulder, right_shoulder)
 
@@ -75,10 +77,12 @@ def analyze_foot_knee_placement(
     left_foot_index = [
         landmarks[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value].x,
         landmarks[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value].y,
+        landmarks[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value].z,
     ]
     right_foot_index = [
         landmarks[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value].x,
         landmarks[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value].y,
+        landmarks[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value].z,
     ]
     foot_width = calculate_distance(left_foot_index, right_foot_index)
 
@@ -107,10 +111,12 @@ def analyze_foot_knee_placement(
     left_knee = [
         landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
         landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y,
+        landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].z,
     ]
     right_knee = [
         landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
         landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y,
+        landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].z,
     ]
     knee_width = calculate_distance(left_knee, right_knee)
 

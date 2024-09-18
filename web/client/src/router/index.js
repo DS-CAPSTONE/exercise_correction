@@ -9,6 +9,11 @@ const router = createRouter({
             component: () => import("../views/Home.vue"),
         },
         {
+            path: "/live",
+            name: "LiveStreaming",
+            component: () => import("../views/LiveStreaming.vue"),
+        },
+        {
             path: "/video",
             name: "VideoStreaming",
             component: () => import("../views/VideoStreaming.vue"),

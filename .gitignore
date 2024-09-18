@@ -45,8 +45,15 @@ temp/
 
 # References
 github/
-web/*/static/media/
-web/*/static/images/
+
+# Ignore all files in these directories
+web/*/static/media/**/*
+web/*/static/images/**/*
 web/*/static/assets/
 web/*/static/css/
+
+# But do not ignore the directories themselves
+!web/*/static/media/
+!web/*/static/images/
+
 *.env

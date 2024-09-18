@@ -72,7 +72,8 @@ const uploadToServer = async () => {
             </div>
 
             <button class="process-btn" @click="uploadToServer">
-                <span>Process!</span>
+<!--                <span>Process!</span>-->
+                    <i class="fa-solid fa-play"></i>
             </button>
         </div>
     </section>
@@ -121,6 +122,7 @@ const uploadToServer = async () => {
 
                 &.active {
                     background-color: var(--primary-color);
+                    color: whitesmoke;
                     font-weight: 700;
                 }
             }
@@ -132,7 +134,7 @@ const uploadToServer = async () => {
             padding: 1.25rem 0;
 
             color: whitesmoke;
-            font-size: 1.25rem;
+            font-size: 2rem;
             font-weight: 700;
             cursor: pointer;
             border-radius: 8px;

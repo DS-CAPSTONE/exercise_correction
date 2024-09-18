@@ -79,7 +79,7 @@ const byteToMB = (bytes) => {
         <!-- Initial Stage -->
         <template v-if="!isUploaded">
             <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
-            Drop files or Click here to select files to upload.
+            Drop or Click to upload Video
         </template>
 
         <!-- Uploaded State -->
@@ -116,13 +116,14 @@ const byteToMB = (bytes) => {
 
     &-dragging,
     &:hover {
-        background-color: lighten(#41b883, 38%);
+        background-color: lighten(#9e6dd3, 38%);
     }
 
     &-icon {
         display: block;
-        font-size: 3rem;
-        margin: 0 auto 1.5rem;
+        font-size: 4.5rem;
+        //margin: 0 auto 1.5rem;
+        margin: 0 auto;
         color: var(--primary-color);
     }
 

@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import OpenAI from "openai";
 
 import Video from "./Video.vue";
 
@@ -33,12 +34,56 @@ const jumpToVideoLocation = (second) => {
     selectedDisplay.value = "video";
     videoStart.value = second;
 };
+
+// ChatGPT
+const chatGptMessage = ref("Before Loaded");
+// const APIKEY = import.meta.env.VITE_OPENAI_API_KEY;
+// console.log('APIKEY :', APIKEY);
+const callChatGPT = async (summaryData) => {
+    const openai = new OpenAI({
+      apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+      dangerouslyAllowBrowser: true,
+    })
+    const prompt = `I have analyzed the video and found ${summaryData.totalInString}. Here are the details:`;
+    const errors = Object.entries(summaryData.details).map(
+        ([error, total]) => `${error}: ${total}`
+    );
+    console.log('prompt :', prompt);
+    // console.log(`${prompt}\n${errors.join("\n")}`);
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a helpful fitness trainer. Detailed description friendly.',
+      },
+      {
+        role: 'user',
+        // content: `${prompt}\n${errors.join("\n")}`,
+        content: prompt,
+      },
+    ]
+  })
+  chatGptMessage.value = response.choices[0].message.content;
+  console.log('chatgpt result : response.choices[0].message', response.choices[0].message)
+};
+onMounted(async () => {
+    await callChatGPT(summaryData.value);
+});
+
+
 </script>
 
 <template>
     <section class="result-section">
         <!-- Navigators -->
         <ul class="tab-links">
+            <li
+                :class="{ active: selectedDisplay == 'chatgpt' }"
+                @click="() => (selectedDisplay = 'chatgpt')"
+            >
+                ChatGPT
+            </li>
             <li
                 :class="{ active: selectedDisplay == 'summary' }"
                 @click="() => (selectedDisplay = 'summary')"
@@ -61,6 +106,15 @@ const jumpToVideoLocation = (second) => {
 
         <!-- Contents -->
         <div class="tab-container">
+            <!-- ChatGPT content -->
+            <template v-if="selectedDisplay == 'chatgpt'">
+                <p class="main">
+                    <span class="info-color>">
+                      AI's comment: {{ chatGptMessage }}
+                    </span>
+                </p>
+            </template>
+
             <!-- Summary content -->
             <template v-if="selectedDisplay == 'summary'">
                 <!-- Display Counter or other information -->
@@ -129,7 +183,7 @@ const jumpToVideoLocation = (second) => {
                         <Video
                             :video-name="data.file_name"
                             :start-at="videoStart"
-                        ></Video>
+                        />
                     </div>
                 </template>
             </KeepAlive>

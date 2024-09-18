@@ -2,14 +2,14 @@
 
 <template>
     <div class="container">
-        <RouterLink to="#" class="box">
+        <RouterLink :to="{ name: 'LiveStreaming' }" class="box" id="LiveStreamingBox">
             <i class="fa-solid fa-video"></i>
-            <p class="box__description">Real Time</p>
+<!--            <p class="box__description">Real Time</p>-->
         </RouterLink>
 
-        <RouterLink :to="{ name: 'VideoStreaming' }" class="box">
+        <RouterLink :to="{ name: 'VideoStreaming' }" class="box" id="VideoStreamingBox">
             <i class="fa-solid fa-upload"></i>
-            <p class="box__description">Video Upload</p>
+<!--            <p class="box__description">Video Upload</p>-->
         </RouterLink>
     </div>
 </template>
@@ -41,7 +41,7 @@
         transition: all 0.2s ease-in;
 
         i {
-            font-size: 3rem;
+            font-size: 4rem;
             color: var(--primary-color);
         }
 

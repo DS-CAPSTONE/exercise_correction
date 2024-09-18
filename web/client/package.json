@@ -10,10 +10,11 @@
         "move:assets": "rsync -a --delete ./dist/static/* ../server/static/",
         "move:index": "cp -fr ./dist/index.html ../server/templates/",
         "move-build-to-server": "npm run move:assets && npm run move:index",
-        "set-base-url": "rm -f .env.local && echo \"VITE_BASE_URL=http://127.0.0.1\" >| .env.local"
+        "set-base-url": "rm -f .env.local && echo \"VITE_BASE_URL=http://127.0.0.1:8000\" >| .env.local"
     },
     "dependencies": {
         "axios": "^1.1.2",
+        "openai": "^4.57.0",
         "pinia": "^2.0.21",
         "sass": "^1.55.0",
         "vue": "^3.2.38",

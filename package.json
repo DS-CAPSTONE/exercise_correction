@@ -7,18 +7,8 @@
         "install:website": "cd ./web && npm run install:all",
         "install:client": "cd ./web && npm run install:client",
         "start:website": "cd ./web && npm run start:website",
-        "remove-static-from-web": "cd ./web/server && python manage.py runscript static_remover",
-        "build:docker": "docker build -t ec .",
-        "run:docker": "docker run -e VITE_BASE_URL=http://127.0.0.1 -p 80:8000 ec"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/NgoQuocBao1010/Exercise-Correction.git"
+        "remove-static-from-web": "cd ./web/server && python manage.py runscript static_remover"
     },
     "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/NgoQuocBao1010/Exercise-Correction/issues"
-    },
-    "homepage": "https://github.com/NgoQuocBao1010/Exercise-Correction#readme"
+    "license": "ISC"
 }

@@ -45,30 +45,38 @@ def analyze_knee_angle(
     right_hip = [
         landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
         landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y,
+        landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].z,
     ]
     right_knee = [
         landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
         landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y,
+        landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].z,
     ]
     right_ankle = [
         landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,
         landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y,
+        landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].z,
     ]
+    # print("right_hip", right_hip, "right_knee", right_knee, "right_ankle", right_ankle)
     results["right"]["angle"] = calculate_angle(right_hip, right_knee, right_ankle)
 
     # Calculate left knee angle
     left_hip = [
         landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
         landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y,
+        landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].z,
     ]
     left_knee = [
         landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
         landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y,
+        landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].z,
     ]
     left_ankle = [
         landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].x,
         landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].y,
+        landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].z,
     ]
+    # print("left_hip", left_hip, "left_knee", left_knee, "left_ankle", left_ankle)
     results["left"]["angle"] = calculate_angle(left_hip, left_knee, left_ankle)
 
     # Draw to image
@@ -79,7 +87,7 @@ def analyze_knee_angle(
         cv2.putText(
             image,
             str(int(results["right"]["angle"])),
-            tuple(np.multiply(right_knee, video_dimensions).astype(int)),
+            tuple(np.multiply(right_knee[:2], video_dimensions).astype(int)),
             cv2.FONT_HERSHEY_COMPLEX,
             0.5,
             (255, 255, 255),
@@ -89,7 +97,7 @@ def analyze_knee_angle(
         cv2.putText(
             image,
             str(int(results["left"]["angle"])),
-            tuple(np.multiply(left_knee, video_dimensions).astype(int)),
+            tuple(np.multiply(left_knee[:2], video_dimensions).astype(int)),
             cv2.FONT_HERSHEY_COMPLEX,
             0.5,
             (255, 255, 255),
@@ -153,7 +161,7 @@ def analyze_knee_angle(
         cv2.putText(
             image,
             str(int(results["right"]["angle"])),
-            tuple(np.multiply(right_knee, video_dimensions).astype(int)),
+            tuple(np.multiply(right_knee[:2], video_dimensions).astype(int)),
             cv2.FONT_HERSHEY_COMPLEX,
             0.5,
             right_color,
@@ -163,7 +171,7 @@ def analyze_knee_angle(
         cv2.putText(
             image,
             str(int(results["left"]["angle"])),
-            tuple(np.multiply(left_knee, video_dimensions).astype(int)),
+            tuple(np.multiply(left_knee[:2], video_dimensions).astype(int)),
             cv2.FONT_HERSHEY_COMPLEX,
             0.5,
             left_color,

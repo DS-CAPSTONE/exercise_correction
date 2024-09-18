@@ -25,15 +25,25 @@ def calculate_angle(point1: list, point2: list, point3: list) -> float:
     point1 = np.array(point1)
     point2 = np.array(point2)
     point3 = np.array(point3)
+    # print("Point 1: ", point1, "Point 2: ", point2, "Point 3: ", point3)
 
     # Calculate algo
-    angleInRad = np.arctan2(point3[1] - point2[1], point3[0] - point2[0]) - np.arctan2(
-        point1[1] - point2[1], point1[0] - point2[0]
-    )
-    angleInDeg = np.abs(angleInRad * 180.0 / np.pi)
 
-    angleInDeg = angleInDeg if angleInDeg <= 180 else 360 - angleInDeg
+    vector1 = point1 - point2
+    vector2 = point3 - point2
+
+    dot_product = np.dot(vector1, vector2)
+
+    cross_product = np.linalg.norm(np.cross(vector1, vector2))
+
+    angleInRad = np.arctan2(cross_product, dot_product)
+    # print("Angle in radian: ", angleInRad)
+
+    angleInDeg = np.degrees(angleInRad)
+    # print("Angle in degree: ", angleInDeg)
+
     return angleInDeg
+
 
 
 def calculate_distance(pointX: list, pointY: list) -> float:
@@ -47,10 +57,10 @@ def calculate_distance(pointX: list, pointY: list) -> float:
         float: _description_
     """
 
-    x1, y1 = pointX
-    x2, y2 = pointY
+    x1, y1, z1 = pointX
+    x2, y2, z2 = pointY
 
-    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
 
 
 def extract_important_keypoints(results, important_landmarks: list) -> list:
