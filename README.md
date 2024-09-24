@@ -49,21 +49,21 @@ This is an example of how you may give instructions on setting up the project lo
 1. Clone the repo and change directory to that folder
 
     ```sh
-    git clone https://github.com/CreamMeatball/TrAiAngle.git
+    git clone https://github.com/DS-CAPSTONE/exercise_correction/tree/main
     ```
 
 
-2. Create the Virtual Environment with Python 3.9.19 version.
+2. Create the Virtual Environment with Python 3.9.6 version.
 
    I create the Virtual Environment by using IDE PyCharm.
    
-   Additionally, the pip version in python 3.9.19 Virtual Environment is 23.2.1
+   Additionally, the pip version in python 3.9.6 Virtual Environment is 23.2.1
    
    And you should install Node and NPM.
    
-   Node : 21.3.0
+   Node : v22.2.0
    
-   NPM : 10.2.4
+   NPM : 10.7.0
 
 
 3. Install all project dependencies

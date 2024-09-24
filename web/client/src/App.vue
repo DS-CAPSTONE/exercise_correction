@@ -6,8 +6,7 @@
         <!-- Navbar -->
         <nav>
             <RouterLink :to="{ name: 'Home' }" class="nav__header">
-              <i class="fa-solid fa-caret-right"></i>
-                TRAiANGLE
+                DS_CAPSTONE EXCERCISE CORRECTION
             </RouterLink>
         </nav>
 
