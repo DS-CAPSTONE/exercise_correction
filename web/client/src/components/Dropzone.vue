@@ -18,6 +18,19 @@ watch(
     }
 );
 
+const props = defineProps({
+    externalFile: File,
+});
+
+watch(
+    () => props.externalFile,
+    (newFile) => {
+        if (newFile) {
+            uploadedVideoFile.value = newFile;
+        }
+    }
+);
+
 // * Handle Drag Events
 const removeDragEventDefault = (event) => {
     event.preventDefault();

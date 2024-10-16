@@ -114,6 +114,7 @@ This is an example of how you may give instructions on setting up the project lo
    migrate with 'manage.py'.
    
    ```
+   cd /Users/jainilpatel/PycharmProjects/Exercise-Correction/web/server
    python manage.py migrate
    ```
 

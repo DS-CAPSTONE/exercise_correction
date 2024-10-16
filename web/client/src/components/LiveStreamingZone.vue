@@ -1,59 +1,91 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { useVideoStore} from "@/videoStore";
 
+const router = useRouter();
+const videoStore = useVideoStore()
 const camera = ref(null);
-const picture = ref(null);
+const mediaRecorder = ref(null);
+const recordedChunks = ref([]);
+const isRecording = ref(false);
 
 const getVideo = () => {
     navigator.mediaDevices
-        .getUserMedia({ video: true })
+        .getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 832 },
+            // frameRate: { ideal: 30 },
+            facingMode: "user",
+          },
+        })
         .then((stream) => {
             let video = camera.value;
             video.srcObject = stream;
             video.play();
-            video.onloadedmetadata = () => {
-                console.log(`Video Width: ${video.videoWidth}, Video Height: ${video.videoHeight}`);
+            mediaRecorder.value = new MediaRecorder(stream);
+            mediaRecorder.value.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.value.push(event.data);
+                }
             };
         })
         .catch((err) => console.log(err));
 };
 
-const takeSnapshot = () => {
-    const width = 100;
-    const height = width * (camera.value.videoHeight / camera.value.videoWidth);
+const startRecording = () => {
+    recordedChunks.value = [];
+    mediaRecorder.value.start();
+    isRecording.value = true;
+};
 
-    let video = camera.value;
+const stopRecording = () => {
+    mediaRecorder.value.stop();
+    isRecording.value = false;
+};
 
-    picture.value.width = width;
-    picture.value.height = height;
+const saveRecording = () => {
+  const blob = new Blob(recordedChunks.value, { type: "video/webm" });
+  console.log('Blob:', blob); // Should show type "video/webm"
 
-    let ctx = picture.value.getContext("2d");
-    ctx.drawImage(video, 0, 0, width, height);
+  // No need to create a File object here unless necessary
+  videoStore.videoBlob = blob;
+  router.push("/video");
 };
 
 watch(camera, () => {
     getVideo();
+});
+
+onMounted(() => {
+    getVideo();
+});
+
+onUnmounted(() => {
+    if (mediaRecorder.value && mediaRecorder.value.state !== "inactive") {
+        mediaRecorder.value.stop();
+    }
 });
 </script>
 
 <template>
     <div class="camera">
         <div class="camera__wrapper">
-            <video ref="camera"></video>
+            <video ref="camera" class="flipped"></video>
         </div>
-<!--        <div class="snapButtonContainer">-->
-<!--            <button @click="takeSnapshot" class="snapButton">SNAP!</button>-->
-<!--        </div>-->
+
+        <button @click="isRecording ? stopRecording() : startRecording()">
+            {{ isRecording ? "Stop Recording" : "Start Recording" }}
+        </button>
+        <button @click="saveRecording" :disabled="isRecording">Save Recording</button>
     </div>
-<!--    <div class="result">-->
-<!--        <canvas ref="picture"></canvas>-->
-<!--    </div>-->
 </template>
 
 <style lang="scss" scoped>
 .camera {
-    background-color: rgba(0, 255, 255, 0.5);
-    //display: flex;
+    //background-color: rgba(0, 255, 255, 0.5);
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -70,18 +102,7 @@ watch(camera, () => {
     }
 }
 
-.snapButtonContainer {
-    height: 30px;
-    display: flex;
-    justify-content: center;
-}
-
-.snapButton {
-  width: 60px;
-  height: 20px;
-}
-
-.result {
-    //margin-top: 2rem;
+.flipped {
+    transform: scaleX(-1); /* Flip the video horizontally */
 }
 </style>
