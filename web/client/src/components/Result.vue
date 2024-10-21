@@ -41,7 +41,7 @@ const chatGptMessage = ref("Before Loaded");
 // console.log('APIKEY :', APIKEY);
 const callChatGPT = async (summaryData) => {
     const openai = new OpenAI({
-      apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+      apiKey: "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",
       dangerouslyAllowBrowser: true,
     })
     const prompt = `I have analyzed the video and found ${summaryData.totalInString}. Here are the details:`;
