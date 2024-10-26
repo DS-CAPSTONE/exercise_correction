@@ -100,6 +100,7 @@ def video_frame_callback(frame: av.VideoFrame, selected_exercise):
 import av
 import cv2
 import numpy as np
+skeleton_img = get_static_file_url("assets/skeleton.jpg")
 
 def video_frame_callback_fake(frame, exercise_type):
     img = frame.to_ndarray(format="bgr24")  # Convert the frame to a numpy array
@@ -126,7 +127,92 @@ def video_frame_callback_fake(frame, exercise_type):
     # Return the modified frame
     return av.VideoFrame.from_ndarray(img, format="bgr24")
 
+def survey_section():
+    st.header("User Feedback Survey")
+
+    # User Name Input
+    user_name = st.text_input("Enter your name:")
+
+    # Date Input for next workout planning
+    next_workout_date = st.date_input("Select your next workout date:")
+
+    # Upload an image of the workout
+    workout_image = st.file_uploader("Upload an image of your workout (optional):", type=["jpg", "jpeg", "png"])
+
+    # Weight recorded
+    weight_recorded = st.number_input("Enter your weight (in kg):", min_value=0.0)
+
+    # Max heart rate recorded
+    max_heart_rate = st.number_input("Enter your max heart rate (in bpm):", min_value=0)
+
+    # Checkboxes for body parts triggered
+    body_parts = st.multiselect(
+        "Which body parts did you focus on today?",
+        ["Arms", "Legs", "Back", "Chest", "Core", "Shoulders"]
+    )
+
+    # Feelings after exercise
+    feelings = st.selectbox(
+        "How do you feel after exercising?",
+        ["Very Good", "Good", "Neutral", "Bad", "Very Bad"]
+    )
+
+    # Muscle workout intensity
+    muscle_workout = st.slider(
+        "How much do you think your muscles are worked out?",
+        0, 10, 5  # Scale from 0 (not at all) to 10 (extremely)
+    )
+
+    # Feelings about doing the exercise
+    exercise_feeling = st.selectbox(
+        "How do you feel about doing this exercise?",
+        ["Excited", "Motivated", "Indifferent", "Tired", "Dread"]
+    )
+
+    # Option to record pain
+    record_pain = st.radio(
+        "Do you want to record any pain?",
+        ["Yes", "No"]
+    )
+
+    # If user wants to record pain, provide an input field
+    pain_description = ""
+    if record_pain == "Yes":
+        pain_description = st.text_area("Please describe the pain (optional):")
+
+    # Submit button for the survey
+    if st.button("Submit Survey"):
+        if user_name:
+            st.success("Thank you for your feedback!")
+            # Displaying the survey data
+            st.write(f"Name: {user_name}")
+            st.write(f"Next Workout Date: {next_workout_date}")
+            if workout_image is not None:
+                st.image(workout_image, caption="Uploaded Workout Image", use_column_width=True)
+            st.write(f"Weight Recorded: {weight_recorded} kg")
+            st.write(f"Max Heart Rate Recorded: {max_heart_rate} bpm")
+            st.write(f"Body Parts Focused: {', '.join(body_parts)}")
+            st.write(f"Feelings after Exercise: {feelings}")
+            st.write(f"Muscle Workout Intensity: {muscle_workout}")
+            st.write(f"Feelings about the Exercise: {exercise_feeling}")
+            if record_pain == "Yes":
+                st.write(f"Pain Description: {pain_description}")
+        else:
+            st.error("Please enter your name before submitting.")
+
+
 def main():
+    st.markdown(
+        """
+        <style>
+        /* Tinted gradient background */
+        .main {
+            background: linear-gradient(135deg, rgba(240, 255, 240, 1), rgba(200, 255, 200, 0.7));
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     st.title("Real-Time Exercise Posture Correction App")
     st.sidebar.title("Exercise Detection Models")
 
@@ -172,7 +258,6 @@ def main():
     # Skeleton Image for Pain Detection
     st.header("Pain Detection System")
     st.write("Click on the skeleton image to indicate pain areas during exercise.")
-    skeleton_img = get_static_file_url("assets/skeleton.jpg")
 
 
     # Using Streamlit's image click function for pain detection
@@ -211,6 +296,8 @@ def main():
     if st.session_state["coordinates"] != (None, None):
         x, y = st.session_state["coordinates"]
         st.write(f"Latest Clicked Point - x: {x}, y: {y}")
+
+    survey_section()
 
 if __name__ == "__main__":
     main()
