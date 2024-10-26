@@ -36,7 +36,7 @@ exercise_models = {
     "Lunge": LungeDetection(),
 }
 # Initialize OpenAI API
-openai.api_key = 'your_openai_api_key'  # replace with your API key
+openai.api_key = "sk-proj-Xzh04" + "rXHHRmzJr4L6d4mYAtivOvAu-j8I5-v5Tan0" + "-6ndPqD-14aw84PYbVH_Gnx86Pwe9FctnT3BlbkFJQiJjPIbtrTn" + "LZdP0cxTYdPu_B82tpq3dEcMRoMWMqkNf1uzRLhg4P91OpdqNpz7VniVUgeFbwA"  # replace with your API key
 
 
 def preprocess_image(image):
@@ -220,18 +220,19 @@ def main():
     choice = st.sidebar.selectbox("Select Exercise", list(exercise_models.keys()))
 
     # Sidebar - Chat with ChatGPT
-    st.sidebar.title("Chat with GPT")
+    st.sidebar.title("Chat with AI TRAINER")
     user_input = st.sidebar.text_area("Ask a question:", placeholder="Type here...")
 
     # Send user input to ChatGPT and get response
     if st.sidebar.button("Get Response"):
         if user_input:
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=user_input,
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": user_input}],
                 max_tokens=100
             )
-            st.sidebar.write("GPT says:", response.choices[0].text.strip())
+            # Display the response correctly
+            st.sidebar.write("TRAINER says:", response['choices'][0]['message']['content'].strip())
 
     # Main Screen for Exercise Posture Correction
     if choice == "Home":
@@ -250,7 +251,7 @@ def main():
             key="posture-correction",
             mode=WebRtcMode.SENDRECV,
             rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-            video_frame_callback=lambda frame: video_frame_callback(frame, choice),
+            video_frame_callback=lambda frame: video_frame_callback_fake(frame, choice),
             media_stream_constraints={"video": True, "audio": False},
             async_processing=False,
         )
