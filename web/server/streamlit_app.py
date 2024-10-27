@@ -100,6 +100,70 @@ exercise_models = {
 # Initialize OpenAI API
 openai.api_key = "sk-proj-Xzh04" + "rXHHRmzJr4L6d4mYAtivOvAu-j8I5-v5Tan0" + "-6ndPqD-14aw84PYbVH_Gnx86Pwe9FctnT3BlbkFJQiJjPIbtrTn" + "LZdP0cxTYdPu_B82tpq3dEcMRoMWMqkNf1uzRLhg4P91OpdqNpz7VniVUgeFbwA"  # replace with your API key
 
+# Define body part regions
+body_parts = {
+    "Head (Front)": (0, 0, 300, 100),
+    "Left Shoulder (Front)": (50, 100, 150, 150),
+    "Right Shoulder (Front)": (150, 100, 250, 150),
+    "Chest": (75, 150, 225, 200),
+    "Abdomen": (100, 200, 200, 300),
+    "Left Arm (Front)": (0, 150, 75, 400),
+    "Right Arm (Front)": (225, 150, 300, 400),
+    "Hips": (100, 300, 200, 350),
+    "Left Leg (Front)": (50, 350, 150, 587),
+    "Right Leg (Front)": (150, 350, 250, 587),
+    "Head (Back)": (310, 0, 500, 100),
+    "Left Shoulder (Back)": (360, 100, 410, 150),
+    "Right Shoulder (Back)": (450, 100, 500, 150),
+    "Upper Back": (360, 150, 468, 180),
+    "Middle Back": (370, 180, 468, 266),
+    "Left Arm (Back)": (310, 150, 360, 400),
+    "Right Arm (Back)": (500, 150, 550, 400),
+    "Glutes": (360, 266, 475, 350),
+    "Left Leg (Back)": (300, 350, 420, 587),
+    "Right Leg (Back)": (420, 350, 550, 587)
+}
+
+# Function to identify body part based on coordinates
+def identify_body_part(x, y):
+    for part, (x_min, y_min, x_max, y_max) in body_parts.items():
+        if x_min <= x <= x_max and y_min <= y <= y_max:
+            return part
+    return "Unknown"
+
+# Define body part to exercise recommendations
+exercise_recommendations = {
+    "Head (Front)": ["Neck stretches", "Shoulder shrugs", "Head rotations"],
+    "Left Shoulder (Front)": ["Shoulder rolls", "Arm circles", "Pendulum stretch"],
+    "Right Shoulder (Front)": ["Shoulder rolls", "Arm circles", "Pendulum stretch"],
+    "Chest": ["Chest stretch", "Arm pull stretch", "Wall push-ups"],
+    "Abdomen": ["Pelvic tilts", "Seated knee lifts", "Core twist stretches"],
+    "Left Arm (Front)": ["Wrist flexor stretch", "Bicep curls", "Arm stretches"],
+    "Right Arm (Front)": ["Wrist flexor stretch", "Bicep curls", "Arm stretches"],
+    "Hips": ["Hip flexor stretch", "Standing leg raises", "Knee-to-chest stretch"],
+    "Left Leg (Front)": ["Quad stretch", "Calf raises", "Seated hamstring stretch"],
+    "Right Leg (Front)": ["Quad stretch", "Calf raises", "Seated hamstring stretch"],
+    "Head (Back)": ["Neck extensions", "Shoulder blade squeeze", "Head tilts"],
+    "Left Shoulder (Back)": ["Shoulder blade squeeze", "Backward arm circles", "Scapula stretch"],
+    "Right Shoulder (Back)": ["Shoulder blade squeeze", "Backward arm circles", "Scapula stretch"],
+    "Upper Back": ["Cat-cow stretch", "Child's pose", "Thoracic extension"],
+    "Middle Back": ["Seated twist", "Lat stretch", "Back rotations"],
+    "Left Arm (Back)": ["Tricep stretches", "Wrist flexor stretch", "Arm circles"],
+    "Right Arm (Back)": ["Tricep stretches", "Wrist flexor stretch", "Arm circles"],
+    "Glutes": ["Pigeon stretch", "Seated figure-four stretch", "Glute bridges"],
+    "Left Leg (Back)": ["Hamstring stretch", "Lunges", "Calf raises"],
+    "Right Leg (Back)": ["Hamstring stretch", "Lunges", "Calf raises"]
+}
+
+# Function to suggest an exercise based on the paining body part
+def suggest_exercise(body_part):
+    exercises = exercise_recommendations.get(body_part)
+    if exercises:
+        return random.choice(exercises)
+    else:
+        return "No exercise recommendation available for this body part."
+
+
 
 def preprocess_image(image):
     """Preprocess the image (resize, convert color)."""
@@ -383,7 +447,10 @@ def main():
     # Display the latest coordinates
     if st.session_state["coordinates"] != (None, None):
         x, y = st.session_state["coordinates"]
-        st.write(f"Latest Clicked Point - x: {x}, y: {y}")
+        part = identify_body_part(x, y)
+        st.write(f"Latest Clicked Point - x: {x}, y: {y} part: {part}")
+        recommended_exercise = suggest_exercise(part)
+        st.write(f"Recommended exercise for paining {part}: {recommended_exercise}")
 
     survey_section()
 
