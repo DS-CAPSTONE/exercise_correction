@@ -151,7 +151,7 @@ def get_static_file_url(file_name: str) -> str:
         str: Full absolute path of the file. Return None if file is not found
     """
 
-    path = f"/Users/jainilpatel/PycharmProjects/Exercise-Correction/web/server/static/{file_name}"
+    path = f"/Users/suryanshpatel/Projects/exercise_correction/web/server/static/{file_name}"
     print(path)
 
     return path if os.path.exists(path) else None
