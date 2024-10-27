@@ -44,7 +44,7 @@ def preprocess_image(image):
     resized_image = cv2.resize(image, (224, 224))
     return resized_image
 
-
+pose = mp_pose.Pose(min_detection_confidence=0.8, min_tracking_confidence=0.8)
 def video_frame_callback(frame: av.VideoFrame, selected_exercise):
     """Callback to process each video frame and run the selected model."""
     # We got the video.
@@ -57,42 +57,23 @@ def video_frame_callback(frame: av.VideoFrame, selected_exercise):
 
     # Preprocess image
     image.flags.writeable = False
-    with mp_pose.Pose(min_detection_confidence=0.8, min_tracking_confidence=0.8) as pose:
-        results = pose.process(image)
-        image.flags.writeable = True
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-        # Drawing landmarks
-        mp_drawing.draw_landmarks(
-            image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-            mp_drawing.DrawingSpec(color=(244, 117, 66), thickness=2, circle_radius=2),
-            mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=1),
-        )
+    results = pose.process(image)
+    image.flags.writeable = True
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
+    # Drawing landmarks
+    mp_drawing.draw_landmarks(
+        image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+        mp_drawing.DrawingSpec(color=(244, 117, 66), thickness=2, circle_radius=2),
+        mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=1),
+    )
 
-
-        # Apply the selected model
-        exercise_model = exercise_models.get(selected_exercise)
-        if results.pose_landmarks:
-            detection = exercise_model.detect(mp_results=results, image=image)
-        else:
-            top_left = (50, 50)  # Top-left corner of the rectangle
-            bottom_right = (300, 200)  # Bottom-right corner of the rectangle
-            color = (0, 255, 0)  # Rectangle color (Green)
-            thickness = 2  # Thickness of the rectangle border
-
-            # Draw the rectangle on the frame
-            img = cv2.rectangle(img, top_left, bottom_right, color, thickness)
-
-            # Add the exercise type as a label
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            font_scale = 1
-            font_color = (255, 0, 0)  # Font color (Blue)
-            font_thickness = 2
-            text_position = (60, 40)  # Position of the label
-
-            # Put the text label on the frame
-            cv2.putText(img, selected_exercise, text_position, font, font_scale, font_color, font_thickness)
+    # Apply the selected model
+    exercise_model = exercise_models.get(selected_exercise)
+    if results.pose_landmarks:
+        detection = exercise_model.detect(mp_results=results, image=image, timestamp=frame.time)
+        pass
 
 
     return av.VideoFrame.from_ndarray(image, format="bgr24")
@@ -251,7 +232,7 @@ def main():
             key="posture-correction",
             mode=WebRtcMode.SENDRECV,
             rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-            video_frame_callback=lambda frame: video_frame_callback_fake(frame, choice),
+            video_frame_callback=lambda frame: video_frame_callback(frame, choice),
             media_stream_constraints={"video": True, "audio": False},
             async_processing=False,
         )
