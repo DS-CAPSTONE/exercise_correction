@@ -83,31 +83,6 @@ import cv2
 import numpy as np
 skeleton_img = get_static_file_url("assets/skeleton.jpg")
 
-def video_frame_callback_fake(frame, exercise_type):
-    img = frame.to_ndarray(format="bgr24")  # Convert the frame to a numpy array
-
-    # Define rectangle parameters
-    top_left = (50, 50)  # Top-left corner of the rectangle
-    bottom_right = (300, 200)  # Bottom-right corner of the rectangle
-    color = (0, 255, 0)  # Rectangle color (Green)
-    thickness = 2  # Thickness of the rectangle border
-
-    # Draw the rectangle on the frame
-    img = cv2.rectangle(img, top_left, bottom_right, color, thickness)
-
-    # Add the exercise type as a label
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 1
-    font_color = (255, 0, 0)  # Font color (Blue)
-    font_thickness = 2
-    text_position = (60, 40)  # Position of the label
-
-    # Put the text label on the frame
-    cv2.putText(img, exercise_type, text_position, font, font_scale, font_color, font_thickness)
-
-    # Return the modified frame
-    return av.VideoFrame.from_ndarray(img, format="bgr24")
-
 def survey_section():
     st.header("User Feedback Survey")
 
@@ -182,6 +157,25 @@ def survey_section():
             st.error("Please enter your name before submitting.")
 
 
+# Login Section
+def login():
+    if "user_name" not in st.session_state:
+        # Sidebar login section
+        with st.sidebar:
+            st.markdown("### Please log in to continue.")
+            user_name = st.text_input("Enter your name:", key="user_name_input")
+            login_button = st.button("Login")
+
+            if login_button and user_name:
+                st.session_state["user_name"] = user_name
+                st.sidebar.success(f"Welcome, {user_name}!")
+                st.rerun()
+
+                # Refresh to update login status
+            elif login_button and not user_name:
+                st.error("Please enter your name to log in.")
+
+
 def main():
     st.markdown(
         """
@@ -194,8 +188,20 @@ def main():
         """,
         unsafe_allow_html=True
     )
+    # Display main title
     st.title("Real-Time Exercise Posture Correction App")
     st.sidebar.title("Exercise Detection Models")
+
+    ## Only show the main app content if user is logged in
+    if "user_name" in st.session_state:
+        # Main app content
+        st.write(f"Hello, {st.session_state['user_name']}! Start your exercise session.")
+
+    else:
+        login()
+        st.write("Please log in to continue.")
+        return
+
 
     # Sidebar - Select Exercise Model
     choice = st.sidebar.selectbox("Select Exercise", list(exercise_models.keys()))
