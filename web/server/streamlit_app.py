@@ -16,12 +16,74 @@ import openai
 from detection_realtime.utils import (
     get_static_file_url
 )
-
+import av
+skeleton_img = get_static_file_url("assets/skeleton.jpg")
+import base64
+import time
 import cv2
+import streamlit as st
+import random
+from gtts import gTTS
+import tempfile
+from pydub import AudioSegment
+
 
 
 # Add parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
+# Motivational messages
+motivational_messages = [
+    "Welcome to the app! Remember to do the exercise properly.",
+    "You can do it! Stay focused and keep moving.",
+    "Great to have you here! Every step counts.",
+    "Believe in yourself! You are stronger than you think.",
+    "Let's get moving! Your effort today leads to results tomorrow.",
+    "Stay positive! Progress is progress, no matter how small.",
+    "You've got this! Every moment is an opportunity to improve.",
+    "Keep pushing your limits! Challenge yourself to do better.",
+    "Success starts with the first step. Let’s take it together!",
+    "Your journey is unique. Embrace every moment of it!",
+    "Stay committed! Your hard work will pay off in the end.",
+    "Great things take time. Keep at it, and you’ll see results!",
+    "Remember, your only competition is yourself. Be the best you can be!",
+    "Focus on the process, not just the results. Enjoy the journey!",
+    "The only bad workout is the one that didn’t happen.",
+    "Stay strong! Each day is a new chance to improve.",
+    "Consistency is key. Keep showing up, and you will get there!",
+    "Push through the tough times! They will make you stronger.",
+    "Every drop of sweat brings you closer to your goals.",
+    "Stay motivated! You are capable of achieving amazing things.",
+    "Visualize your success! Picture yourself reaching your goals.",
+    "Embrace the challenge! It’s what helps you grow.",
+    "The journey may be tough, but so are you! Keep going.",
+    "Celebrate your victories, no matter how small. They matter!",
+    "Dedication and persistence lead to success. You’ve got this!",
+    "Your body can stand almost anything. It’s your mind that you have to convince.",
+    "You are not alone on this journey. We're in this together!",
+    "Don’t just aim to be better than others; aim to be better than you were yesterday.",
+    "Let your determination be stronger than your excuses.",
+    "Stay committed to your goals, and the results will follow.",
+    "Every day is an opportunity to improve yourself. Take it!",
+    "You're making progress even on days when you feel like you’re not.",
+    "Keep your head up and your heart strong. You're on the right path!",
+    "You have the power to change your story. Start today!",
+    "Believe in your abilities. You are capable of great things!",
+    "Make today count! You won't get this day back.",
+    "You are one workout away from a better mood. Let’s do this!",
+    "Let’s crush those goals together! One step at a time.",
+    "Your effort is a reflection of your dedication. Keep it up!",
+    "Progress, not perfection, is the goal. Keep moving forward.",
+    "Your mindset is everything. Choose positivity!",
+    "Every rep counts, and every step brings you closer.",
+    "Embrace the discomfort! It’s where the growth happens.",
+    "Stay hungry for success! You are just getting started.",
+    "You are stronger than your strongest excuse. Don’t let it win!",
+    "Your potential is limitless! Keep striving for greatness.",
+    "This is your moment! Own it and make the most of it.",
+    "Success is the sum of small efforts repeated day in and day out."
+]
 
 
 # Drawing helpers
@@ -78,10 +140,6 @@ def video_frame_callback(frame: av.VideoFrame, selected_exercise):
 
     return av.VideoFrame.from_ndarray(image, format="bgr24")
 
-import av
-import cv2
-import numpy as np
-skeleton_img = get_static_file_url("assets/skeleton.jpg")
 
 def survey_section():
     st.header("User Feedback Survey")
@@ -175,6 +233,33 @@ def login():
             elif login_button and not user_name:
                 st.error("Please enter your name to log in.")
 
+def autoplay_audio(file_path: str):
+    with open(file_path, "rb") as f:
+        data = f.read()
+        b64 = base64.b64encode(data).decode()
+        md = f"""
+            <audio controls autoplay="true">
+            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            </audio>
+            """
+        st.markdown(
+            md,
+            unsafe_allow_html=True,
+        )
+
+def play_welcome_message(message):
+    # Generate audio from the message
+    tts = gTTS(text=message, lang='en')
+
+    # Use a temporary file to store the audio
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as tmp_file:
+        tts.save(tmp_file.name)
+        # Use Streamlit's audio component to play the audio file
+        autoplay_audio(tmp_file.name)
+        # Load the audio file to calculate duration
+        audio = AudioSegment.from_file(tmp_file.name)
+        duration_in_seconds = len(audio) / 1000.0  # Convert milliseconds to seconds
+        return duration_in_seconds
 
 def main():
     st.markdown(
@@ -196,6 +281,13 @@ def main():
     if "user_name" in st.session_state:
         # Main app content
         st.write(f"Hello, {st.session_state['user_name']}! Start your exercise session.")
+        # Generate the welcome message
+        motivation = random.choice(motivational_messages)
+        welcome_message = f"Welcome, {st.session_state['user_name']}!,  {motivation}"
+
+        # Convert the welcome message to speech
+        play_welcome_message(welcome_message)
+        # Play the audio automatically using HTML
 
     else:
         login()
@@ -211,6 +303,7 @@ def main():
     user_input = st.sidebar.text_area("Ask a question:", placeholder="Type here...")
 
     # Send user input to ChatGPT and get response
+    response_ai = None
     if st.sidebar.button("Get Response"):
         if user_input:
             response = openai.ChatCompletion.create(
@@ -220,6 +313,13 @@ def main():
             )
             # Display the response correctly
             st.sidebar.write("TRAINER says:", response['choices'][0]['message']['content'].strip())
+            response_ai = response['choices'][0]['message']['content'].strip()
+
+    if response_ai:
+
+        seconds_total = play_welcome_message(response_ai)
+        time.sleep(seconds_total+1)
+
 
     # Main Screen for Exercise Posture Correction
     if choice == "Home":
