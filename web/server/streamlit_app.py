@@ -4,6 +4,7 @@ import os
 import random
 import pymongo
 from components import constants, survery, speech, login, video_processing, llm, pain_image
+import base64
 
 # Add parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -17,7 +18,7 @@ collection = db[constants.db_collection]  # Your collection name
 
 st.session_state['userdata'] = {
     'login username' : '',
-    'video data' : [],
+    'video_data' : [],
     'pain data' : [],
     'survey data' : [],
 }
@@ -115,6 +116,36 @@ def display_pain_detection():
     st.write(f"Recommended exercise for paining {part}: {recommended_exercise}")
 
 
+def get_user_history(username):
+    """Fetch user history from the database."""
+    user_data = collection.find_one({"login username": username})
+    if user_data and 'survey data' in user_data:
+        return user_data['survey data']
+    return []
+
+
+def display_user_history():
+    """Display the user's historical data."""
+    username = st.session_state['userdata']['login username']
+    history = get_user_history(username)
+
+    if history:
+        st.header("Your Exercise History")
+        for entry in history:
+            st.write(f"### Date: {entry.get('next_workout_date', 'N/A')}")
+            st.write(f"**Weight Recorded:** {entry.get('weight', 'N/A')} kg")
+            st.write(f"**Max Heart Rate Recorded:** {entry.get('heart_rate', 'N/A')} bpm")
+            st.write(f"**Body Parts Focused:** {', '.join(entry.get('body_parts', []))}")
+            st.write(f"**Feelings after Exercise:** {entry.get('feelings', 'N/A')}")
+            st.write(f"**Muscle Workout Intensity:** {entry.get('intensity', 'N/A')}")
+            st.write(f"**Feelings about the Exercise:** {entry.get('exercise_feeling', 'N/A')}")
+            st.write(f"**Pain Description:** {entry.get('pain', 'N/A')}")
+            if 'workout_image' in entry:
+                st.image(base64.b64decode(entry['workout_image']), caption="Workout Image", use_column_width=True)
+            st.write("---")
+    else:
+        st.write("No history found for this user.")
+
 def main():
     set_page_styles()
     display_titles()
@@ -124,6 +155,7 @@ def main():
         welcome_user()
         sidebar_options()
         handle_main_content()
+        display_user_history()
         survey_data = survery.survey_section() 
         if survey_data:
             st.session_state['userdata']["survey data"].append(survey_data)
