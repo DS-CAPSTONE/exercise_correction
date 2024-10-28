@@ -104,7 +104,7 @@ class BicepPoseAnalysis:
             lean_back_error (bool, optional): If there is an lean back error detected, ignore the analysis. Defaults to False.
 
         Returns:
-            _type_: _description_
+            _type_: _description_ 
         """
         has_error = False
         self.get_joints(landmarks)

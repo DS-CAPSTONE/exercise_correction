@@ -596,6 +596,7 @@ class BicepCurlDetection:
                     1,
                     cv2.LINE_AA,
                 )
+                
 
         except Exception as e:
             traceback.print_exc()
