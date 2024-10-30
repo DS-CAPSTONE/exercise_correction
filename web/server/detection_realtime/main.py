@@ -97,6 +97,7 @@ def exercise_detection(
     video_name_to_save: str,
     exercise_type: str,
     rescale_percent: float = 40,
+    
 ) -> dict:
     """Analyzed Exercise Video
 

@@ -31,7 +31,7 @@ def extract_landmarks(landmarks):
     return []  # Return empty list if no landmarks
 
 
-def video_frame_callback(frame: av.VideoFrame, selected_exercise):
+def video_frame_callback(frame: av.VideoFrame, selected_exercise, user_name):
     """Callback to process each video frame and run the selected model."""
     img = frame.to_ndarray(format="bgr24")
     image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -52,7 +52,7 @@ def video_frame_callback(frame: av.VideoFrame, selected_exercise):
     # Apply the selected model
     exercise_model = exercise_models.get(selected_exercise)
     if results.pose_landmarks:
-        detection = exercise_model.detect(mp_results=results, image=image, timestamp=frame.time)
+        detection = exercise_model.detect(mp_results=results, image=image, timestamp=frame.time, user_name=user_name)
 
         # Collect data from detection
         # Convert the image to base64 to pass it as a string
@@ -75,12 +75,12 @@ def video_frame_callback(frame: av.VideoFrame, selected_exercise):
     return av.VideoFrame.from_ndarray(image, format="bgr24")
 
 
-def video_stream(choice):
+def video_stream(choice , user_name):
     webrtc_streamer(
         key="posture-correction",
         mode=WebRtcMode.SENDRECV,
         rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-        video_frame_callback=lambda frame: video_frame_callback(frame, choice),
+        video_frame_callback=lambda frame: video_frame_callback(frame, choice, user_name),
         media_stream_constraints={"video": True, "audio": False},
         async_processing=False,
     )

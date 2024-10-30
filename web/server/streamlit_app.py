@@ -21,6 +21,7 @@ st.session_state['userdata'] = {
     'video_data' : [],
     'pain data' : [],
     'survey data' : [],
+    'llm_data' : [],
 }
 
 # Motivational messages
@@ -67,13 +68,13 @@ def sidebar_options():
     if st.sidebar.button("Get Response", key="chat_button"):
         response = llm.gpt_response(user_input)
         
-        st.session_state['userdata']["llm data"].append({
+        st.session_state['userdata']["llm_data"].append({
             "question":  user_input,
             "response": response,
         })
         
         st.sidebar.write(response)
-        # llm.speak_response(response)
+        llm.speak_response(response)
 
 def handle_main_content():
     # Add a unique key to avoid duplicate widget ID conflict
@@ -96,7 +97,7 @@ def display_home_screen():
 def display_webcam_feed(choice):
     st.header("Webcam Live Feed")
     st.write("Click on start to use the webcam and check for posture correction.")
-    video_data =  video_processing.video_stream(choice)
+    video_data =  video_processing.video_stream(choice, st.session_state['user_name'])
     if video_data:
         st.session_state['userdata']['video_data'] = video_data
 

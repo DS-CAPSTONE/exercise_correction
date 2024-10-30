@@ -155,3 +155,46 @@ def get_static_file_url(file_name: str) -> str:
     print(path)
 
     return path if os.path.exists(path) else None
+
+
+import streamlit as st
+import sys
+import os
+import random
+import pymongo
+from components import constants, survery, speech, login, video_processing, llm, pain_image
+import base64
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# MongoDB setup
+uri = constants.db_uri
+client = pymongo.MongoClient(uri)
+db = client[constants.db_client]  # Your database name
+collection = db[constants.db_collection]  # Your collection name
+
+def insert_dict_to_mongodb(dictionary, user_name):
+    """
+    Insert a dictionary into MongoDB
+    """
+    
+    dictionary["login username"] = user_name
+    dictionary["utc_timestamp"] = datetime.datetime.now()
+    collection = db[user_name]
+    collection.insert_one(dictionary)
+    
+# Function to convert numpy types to native Python types
+def convert_numpy_types(data):
+    if isinstance(data, dict):
+        return {key: convert_numpy_types(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [convert_numpy_types(item) for item in data]
+    elif isinstance(data, np.integer):
+        return int(data)
+    elif isinstance(data, np.floating):
+        return float(data)
+    elif isinstance(data, np.ndarray):
+        return data.tolist()  # Convert numpy arrays to lists
+    else:
+        return data

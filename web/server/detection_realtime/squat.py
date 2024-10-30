@@ -253,7 +253,7 @@ class SquatDetection:
         self.results = []
         self.has_error = False
 
-    def detect(self, mp_results, image, timestamp) -> None:
+    def detect(self, mp_results, image, timestamp, user_name="") -> None:
         """
         Make Squat Errors detection
         """
