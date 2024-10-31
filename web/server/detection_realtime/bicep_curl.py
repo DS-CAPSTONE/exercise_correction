@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pickle
 import traceback
-
+from detection_realtime.utils import convert_numpy_types, insert_in_process
 from detection_realtime.utils import (
     calculate_angle,
     extract_important_keypoints,
@@ -104,7 +104,7 @@ class BicepPoseAnalysis:
             lean_back_error (bool, optional): If there is an lean back error detected, ignore the analysis. Defaults to False.
 
         Returns:
-            _type_: _description_
+            _type_: _description_ 
         """
         has_error = False
         self.get_joints(landmarks)
@@ -362,6 +362,7 @@ class BicepCurlDetection:
         mp_results,
         image,
         timestamp: int,
+        user_name = ""
     ) -> None:
         """Error detection
 
@@ -596,6 +597,35 @@ class BicepCurlDetection:
                     1,
                     cv2.LINE_AA,
                 )
+            
+            single_data_point = {
+                "predicted_class": predicted_class,
+                "predicted_probability": {
+                    "class_probabilities": list(prediction_probabilities),  # Convert to list for MongoDB
+                    "max_probability": class_prediction_probability,
+                },
+                "posture": self.stand_posture,  # Fix: reference correct posture variable
+                "right_arm_counter": self.right_arm_analysis.counter,
+                "left_arm_counter": self.left_arm_analysis.counter,
+                "right_arm_peak_contraction": self.right_arm_analysis.detected_errors.get("PEAK_CONTRACTION", None),  # Avoid KeyError if not present
+                "left_arm_peak_contraction": self.left_arm_analysis.detected_errors.get("PEAK_CONTRACTION", None),  # Avoid KeyError if not present
+                "lean_back_error": {
+                    "status": "ERROR" if self.stand_posture == "L" else "CORRECT",
+                    "predicted_class": predicted_class,
+                    "prediction_probability": class_prediction_probability,
+                },
+                "timestamp": timestamp,
+                "user_name": user_name
+            }
+      
+            
+            # Convert numpy types for MongoDB compatibility
+            clean_data_point = convert_numpy_types(single_data_point)
+
+            
+            insert_in_process(clean_data_point, user_name=user_name)
+            
+
 
         except Exception as e:
             traceback.print_exc()
