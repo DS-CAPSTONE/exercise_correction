@@ -7,7 +7,7 @@ from detection_realtime.utils import (
     calculate_angle,
     extract_important_keypoints,
     get_static_file_url,
-    get_drawing_color,
+    get_drawing_color, convert_numpy_types, insert_in_process,
 )
 
 mp_drawing = mp.solutions.drawing_utils
@@ -298,6 +298,8 @@ class LungeDetection:
                 2,
             )
 
+
+
             # Evaluate stage prediction for counter
             if (
                 stage_predicted_class == "I"
@@ -455,6 +457,57 @@ class LungeDetection:
                 1,
                 cv2.LINE_AA,
             )
+
+            # stage_predicted_class
+            # stage_predicted_class.split(" ")[0]
+            # self.current_stage
+            # err_predicted_class
+            # err_prediction_probability
+            # errors_from_this_rep
+            # analyzed_results
+            # self.counter
+            # image
+            # k_o_t_error
+
+            single_data_point = {
+                # Prediction results
+                "predicted_class": stage_predicted_class,  # Use the correct prediction variable here
+                "predicted_probability": {
+                    "class_probabilities": list(stage_prediction_probabilities),
+                    # Convert to list for MongoDB compatibility
+                    "max_probability": stage_prediction_probability,  # Probability already in float
+                },
+
+                # Error detection
+                "knee_over_toe_error": {
+                    "status": k_o_t_error,  # Can be "Incorrect" or "Correct"
+                    "predicted_class": err_predicted_class,
+                    "prediction_probability": err_prediction_probability,  # Error probability
+                },
+
+                # Posture and counters
+                "posture": self.current_stage,  # Current stage of exercise
+                "exercise_counter": self.counter,  # Count of exercise repetitions
+                "timestamp": timestamp,  # Assuming timestamp is in a MongoDB-compatible format
+
+                # User information
+                "user_name": user_name,  # Name of the user, if applicable
+                "exercise": "Lunge",  # Hardcoded exercise type as Lunge
+
+                # Additional analysis results (optional - only if you need them)
+                "errors_from_this_rep": list(errors_from_this_rep),  # Convert map object to list if needed
+            }
+
+            # Convert numpy types for MongoDB compatibility
+            clean_data_point = convert_numpy_types(single_data_point)
+
+            # Insert into MongoDB
+            insert_in_process(clean_data_point, user_name=user_name)
+
+            # Convert numpy types for MongoDB compatibility
+            clean_data_point = convert_numpy_types(single_data_point)
+
+            insert_in_process(clean_data_point, user_name=user_name)
 
         except Exception as e:
             print(f"Error while detecting lunge errors: {e}")

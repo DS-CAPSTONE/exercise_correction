@@ -5,7 +5,8 @@ import pickle
 import mediapipe as mp
 import torch
 
-from detection_realtime.utils import extract_important_keypoints, get_static_file_url, get_drawing_color
+from detection_realtime.utils import extract_important_keypoints, get_static_file_url, get_drawing_color, \
+    convert_numpy_types, insert_in_process
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -217,6 +218,27 @@ class PlankDetection:
                 2,
                 cv2.LINE_AA,
             )
+
+            # Data to save in MongoDB
+            single_data_point = {
+                "predicted_class": predicted_class,
+                "prediction_probability": {
+                    "class_probabilities": list(prediction_probability),  # Convert to list for MongoDB
+                    "max_probability": prediction_probability[prediction_probability.argmax()],
+                },
+                "has_error": self.has_error,
+                "current_stage": current_stage,
+                "previous_stage": self.previous_stage,
+                "timestamp": timestamp,
+                "user_name": user_name,
+                "exercise": "Plank"
+            }
+
+            # Ensure all data types are MongoDB-compatible
+            clean_data_point = convert_numpy_types(single_data_point)
+
+            # Insert to MongoDB
+            insert_in_process(clean_data_point, user_name=user_name)
 
         except Exception as e:
             raise Exception(f"Error while detecting plank errors: {e}")

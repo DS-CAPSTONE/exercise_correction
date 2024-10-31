@@ -615,7 +615,8 @@ class BicepCurlDetection:
                     "prediction_probability": class_prediction_probability,
                 },
                 "timestamp": timestamp,
-                "user_name": user_name
+                "user_name": user_name,
+                "exercise": "Bicep Curl"
             }
       
             
