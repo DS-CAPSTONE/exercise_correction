@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pickle
 import traceback
-from detection_realtime.utils import convert_numpy_types, insert_dict_to_mongodb
+from detection_realtime.utils import convert_numpy_types, insert_in_process
 from detection_realtime.utils import (
     calculate_angle,
     extract_important_keypoints,
@@ -623,7 +623,7 @@ class BicepCurlDetection:
             clean_data_point = convert_numpy_types(single_data_point)
 
             
-            insert_dict_to_mongodb(clean_data_point, user_name=user_name)
+            insert_in_process(clean_data_point, user_name=user_name)
             
 
 

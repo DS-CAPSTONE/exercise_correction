@@ -152,7 +152,7 @@ def get_static_file_url(file_name: str) -> str:
     """
 
     path = f"/Users/suryanshpatel/Projects/exercise_correction/web/server/static/{file_name}"
-    print(path)
+
 
     return path if os.path.exists(path) else None
 
@@ -167,23 +167,60 @@ import base64
 
 # Add parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import datetime
+from motor.motor_asyncio import AsyncIOMotorClient
+import asyncio
+from concurrent.futures import ProcessPoolExecutor
+import multiprocessing
 
-# MongoDB setup
+# Motor setup for asynchronous MongoDB handling
 uri = constants.db_uri
-client = pymongo.MongoClient(uri)
-db = client[constants.db_client]  # Your database name
-collection = db[constants.db_collection]  # Your collection name
+client = AsyncIOMotorClient(uri)
+db = client[constants.db_client]  # Database name
 
-def insert_dict_to_mongodb(dictionary, user_name):
+import asyncio
+
+async def async_insert_dict_to_mongodb(dictionary, user_name):
     """
-    Insert a dictionary into MongoDB
+    Asynchronously insert a dictionary into MongoDB
     """
-    
     dictionary["login username"] = user_name
-    dictionary["utc_timestamp"] = datetime.datetime.now()
-    collection = db[user_name]
-    collection.insert_one(dictionary)
-    
+    dictionary["utc_timestamp"] = datetime.datetime.utcnow()  # Use UTC for consistency
+    collection = db[user_name]  # Collection named per user
+    await collection.insert_one(dictionary)
+
+async def insert_in_process_async(dictionary, user_name):
+    """
+    Run async MongoDB insertion without using asyncio.run().
+    """
+    await async_insert_dict_to_mongodb(dictionary, user_name)
+
+
+def insert_in_process(dictionary, user_name):
+    """
+    Insert function compatible with both running and non-running event loops.
+    """
+    try:
+        # Check if there's an active event loop
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None  # No event loop is running
+
+    if loop and loop.is_running():
+        # If there is a running loop, create a task
+        asyncio.create_task(insert_in_process_async(dictionary, user_name))
+    else:
+        # Otherwise, use asyncio.run()
+        asyncio.run(insert_in_process_async(dictionary, user_name))
+
+# def insert_dicts_to_mongodb_in_parallel(dicts, user_name):
+#     """
+#     Insert multiple dictionaries in parallel across different cores.
+#     """
+#     with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+#         futures = [executor.submit(insert_in_process, dictionary, user_name) for dictionary in dicts]
+
+
 # Function to convert numpy types to native Python types
 def convert_numpy_types(data):
     if isinstance(data, dict):
