@@ -17,25 +17,18 @@
         </main>
 
         <!-- Footer -->
-<!--        <footer>-->
-<!--            <a-->
-<!--                href="https://twitter.com/ngohquocbao1010"-->
-<!--                target="_blank"-->
-<!--                class="twitter"-->
-<!--            >-->
-<!--                @NgoQuocBao-->
-<!--            </a>-->
-
-<!--            <a-->
-<!--                href="https://github.com/NgoQuocBao1010/Exercise-Correction"-->
-<!--                target="_blank"-->
-<!--                class="github"-->
-<!--            >-->
-<!--                <i class="fa-brands fa-github"></i>-->
-<!--            </a>-->
-<!--        </footer>-->
+        <footer>
+            <a
+                href="https://github.com/DS-CAPSTONE/exercise_correction"
+                target="_blank"
+                class="github"
+            >
+                <i class="fa-brands fa-github"></i>
+            </a>
+        </footer>
     </div>
 </template>
+
 
 <style lang="scss">
 body {

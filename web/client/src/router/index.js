@@ -19,6 +19,14 @@ const router = createRouter({
             component: () => import("../views/VideoStreaming.vue"),
         },
         {
+            path: "/realtime",
+            name: "RealTimeWebsite",
+            beforeEnter() {
+                // Redirect to the external URL
+                window.location.href = "http://localhost:8501/";
+            },
+        },
+        {
             path: "/:pathMatch(.*)*",
             redirect: { name: "Home" },
         },

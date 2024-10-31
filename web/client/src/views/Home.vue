@@ -11,6 +11,10 @@
             <i class="fa-solid fa-upload"></i>
 <!--            <p class="box__description">Video Upload</p>-->
         </RouterLink>
+        <RouterLink :to="{ name: 'RealTimeWebsite' }" class="box" id="RealTimeWebsite">
+            <i class="fa-solid fa-camera"></i>
+<!--            <p class="box__description">Real Time</p>-->
+        </RouterLink>
     </div>
 </template>
 
