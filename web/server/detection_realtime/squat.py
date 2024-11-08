@@ -8,7 +8,7 @@ from detection_realtime.utils import (
     calculate_distance,
     extract_important_keypoints,
     get_static_file_url,
-    get_drawing_color,
+    get_drawing_color, convert_numpy_types, insert_in_process,
 )
 
 mp_pose = mp.solutions.pose
@@ -445,6 +445,32 @@ class SquatDetection:
                 1,
                 cv2.LINE_AA,
             )
+
+            data_point = {
+                "predicted_class": predicted_class,
+                "prediction_probability": {
+                    "class_probabilities": list(prediction_probabilities),  # Convert to list for MongoDB
+                    "max_probability": prediction_probability  # Direct float conversion applied above
+                },
+                "has_error": self.has_error,
+                "current_stage": self.current_stage,
+                "previous_stage": {
+                    "feet": self.previous_stage.get("feet", "unknown"),
+                    "knee": self.previous_stage.get("knee", "unknown")
+                },
+                "timestamp": timestamp,
+                "user_name": user_name,
+                "exercise": "Squat",
+                "squat_details": {
+                    "counter": self.counter,
+                    "feet_placement": feet_placement,
+                    "knee_placement": knee_placement,
+                }
+            }
+
+            # Ensure data is MongoDB-compatible
+            clean_data_point = convert_numpy_types(data_point)
+            insert_in_process(clean_data_point, user_name=user_name)
 
         except Exception as e:
             print(f"Error while detecting squat errors: {e}")
