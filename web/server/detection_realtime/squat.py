@@ -471,6 +471,7 @@ class SquatDetection:
             # Ensure data is MongoDB-compatible
             clean_data_point = convert_numpy_types(data_point)
             insert_in_process(clean_data_point, user_name=user_name)
+            return clean_data_point
 
         except Exception as e:
             print(f"Error while detecting squat errors: {e}")

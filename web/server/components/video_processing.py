@@ -7,6 +7,9 @@ from detection_realtime.lunge import LungeDetection
 import base64
 import av
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
+import time
+from components import speech
+import streamlit as st
 
 # Drawing helpers
 mp_drawing = mp.solutions.drawing_utils
@@ -21,7 +24,7 @@ exercise_models = {
 }
 
 # Global list to store exercise data and frames
-exercise_data_collection = []  # This will collect data across frames
+# exercise_data_collection = []  # This will collect data across frames
 
 
 def extract_landmarks(landmarks):
@@ -30,8 +33,40 @@ def extract_landmarks(landmarks):
         return [(landmark.x, landmark.y, landmark.z, landmark.visibility) for landmark in landmarks.landmark]
     return []  # Return empty list if no landmarks
 
+import time
+import threading
+from queue import Queue
+from streamlit_webrtc import webrtc_streamer, WebRtcMode
 
-def video_frame_callback(frame: av.VideoFrame, selected_exercise, user_name):
+# Global variables to control error message timing
+last_error_time = 0  # Keeps track of the last error message timestamp
+ERROR_DELAY = 10  # Minimum delay in seconds between error messages
+
+# Queue to handle speech messages
+speech_queue = Queue()
+
+def play_message_in_background(message):
+    """Function to play speech in a separate thread."""
+    while not speech_queue.empty():
+        message = speech_queue.get()
+        # Ensure your speech engine plays this message
+        seconds_total = speech.play_message(message)
+        time.sleep(seconds_total + 1)
+
+        speech_queue.task_done()
+
+
+
+def should_play_message():
+    """Check if 10 seconds have passed since the last error message."""
+    global last_error_time
+    current_time = time.time()
+    if current_time - last_error_time >= ERROR_DELAY:
+        last_error_time = current_time
+        return True
+    return False
+
+def video_frame_callback(frame: av.VideoFrame, selected_exercise, user_name, st=None):
     """Callback to process each video frame and run the selected model."""
     img = frame.to_ndarray(format="bgr24")
     image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -51,26 +86,43 @@ def video_frame_callback(frame: av.VideoFrame, selected_exercise, user_name):
 
     # Apply the selected model
     exercise_model = exercise_models.get(selected_exercise)
+
     if results.pose_landmarks:
         detection = exercise_model.detect(mp_results=results, image=image, timestamp=frame.time, user_name=user_name)
 
-        # Collect data from detection
-        # Convert the image to base64 to pass it as a string
-        _, buffer = cv2.imencode('.jpg', image)  # Encode the image to JPEG format
-        # frame_data = base64.b64encode(buffer).decode('utf-8')  # Encode as base64 string
+        if selected_exercise == "Plank":
+            predicted_class = detection.get("predicted_class", "")
+            if predicted_class == "L" and should_play_message():
+                print("I WANT TO SPEAK, LET ME SPEAK. ")
+                speech_queue.put("Lower back")
+            elif predicted_class == "H" and should_play_message():
+                speech_queue.put("Higher back")
 
-        # Extract landmarks
-        landmarks_data = extract_landmarks(results.pose_landmarks)
+        elif selected_exercise == "Bicep Curl":
+            predicted_class = detection.get("predicted_class", "")
+            if predicted_class != "C" and should_play_message():
+                speech_queue.put("Error")
 
-        # Prepare data to collect
-        data_to_collect = {
-            "timestamp": frame.time,
-            "exercise": selected_exercise,
-            "detection_results": detection,  # or any specific results from your detection
-            "landmarks": landmarks_data,  # Store the landmarks data
-            # "frame": frame_data  # Store the base64-encoded frame if needed
-        }
-        exercise_data_collection.append(data_to_collect)  # Append collected data
+        elif selected_exercise == "Squat":
+            feet_placement = detection.get("squat_details", {}).get("feet_placement", None)
+            knee_placement = detection.get("squat_details", {}).get("knee_placement", None)
+            if feet_placement == "too tight" and should_play_message():
+                speech_queue.put("feet too tight")
+            elif feet_placement == "too wide" and should_play_message():
+                speech_queue.put("feet too wide")
+            elif knee_placement == "too tight" and should_play_message():
+                speech_queue.put("knee too tight")
+            elif knee_placement == "too wide" and should_play_message():
+                speech_queue.put("knee too wide")
+
+        elif selected_exercise == "Lunge":
+            knee_error = detection.get("knee_over_toe_error", {}).get("status", None)
+            if knee_error == "Incorrect" and should_play_message():
+                speech_queue.put("knees are over toe")
+
+            # Start speech playback in a separate thread if there are new messages
+        if not speech_queue.empty():
+            threading.Thread(target=play_message_in_background, args=(speech_queue,)).start()
 
     return av.VideoFrame.from_ndarray(image, format="bgr24")
 
@@ -82,7 +134,6 @@ def video_stream(choice , user_name):
         rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
         video_frame_callback=lambda frame: video_frame_callback(frame, choice, user_name),
         media_stream_constraints={"video": True, "audio": False},
-        async_processing=False,
+        async_processing=True,
     )
 
-    return exercise_data_collection  # Return the collected data

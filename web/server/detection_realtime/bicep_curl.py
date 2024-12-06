@@ -622,9 +622,8 @@ class BicepCurlDetection:
             
             # Convert numpy types for MongoDB compatibility
             clean_data_point = convert_numpy_types(single_data_point)
-
-            
             insert_in_process(clean_data_point, user_name=user_name)
+            return clean_data_point
             
 
 

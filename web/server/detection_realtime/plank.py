@@ -239,6 +239,7 @@ class PlankDetection:
 
             # Insert to MongoDB
             insert_in_process(clean_data_point, user_name=user_name)
+            return clean_data_point
 
         except Exception as e:
             raise Exception(f"Error while detecting plank errors: {e}")

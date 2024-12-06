@@ -42,7 +42,7 @@ def set_page_styles():
     )
 
 def display_titles():
-    st.title("Real-Time Exercise Posture Correction App")
+    st.title("TrAIner")
     st.sidebar.title("Exercise Detection Models")
 
 def login_user():
